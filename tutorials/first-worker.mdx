@@ -7,14 +7,38 @@ icon: play
 This tutorial deploys the `modal-devin` orchestrator for an existing outpost.
 At the end, sessions assigned to that outpost can run inside Modal Sandboxes.
 
+An [outpost](https://docs.devin.ai/cloud/outposts/overview#2-create-an-outpost) is a
+named queue of sessions, not the machine that serves them. The generated orchestrator
+runs on Modal; your local machine is only used to generate and deploy it.
+
 ## Before you begin
 
 You need:
 
 - [uv](https://docs.astral.sh/uv/), Python 3.11 or newer, and a [Modal account](https://modal.com/docs/guide/modal-user-account-setup).
-- A Devin organization with Outposts enabled.
+- A Devin organization with Outposts enabled. Outposts is early access; contact your
+  Cognition account team if it is unavailable.
 - An outpost ID such as `outpost_env-...`.
-- A Devin token authorized to manage the outpost and serve its sessions.
+- A `cog_...` Devin service user token with `account.outposts.orchestrator` and
+  `account.outposts.machine` access. Follow [Create a Devin service user
+  token](/tutorials/create-an-outpost#create-a-devin-service-user-token) rather than
+  using an administrator credential.
+
+## Get an outpost ID
+
+If an administrator has already created the outpost, copy its `outpost_env-...` ID
+from **Settings → Outposts** in the Devin web app. You can also create one from any
+machine with the Devin CLI installed:
+
+```bash
+devin worker outpost create my-outpost \
+  --platform linux \
+  --description "Devin sessions running on Modal"
+```
+
+The command prints the ID needed below. You do not run `devin worker start` locally;
+`modal-devin` starts a worker in a Modal Sandbox for each queued session. See Devin's
+[create-an-outpost instructions](https://docs.devin.ai/cloud/outposts/overview#2-create-an-outpost).
 
 <Steps>
   <Step title="Install modal-devin">
@@ -70,8 +94,8 @@ You need:
 
 ## Verify the deployment
 
-Create or resume a Devin session and select the outpost you deployed. Then
-open the Modal application logs.
+In Devin Cloud, start a new session and select the outpost as its machine. The
+session enters that outpost's queue. Then open the Modal application logs.
 
 <Check>
   The deployment is working when a session invocation starts and its logs show the

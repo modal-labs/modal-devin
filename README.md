@@ -1,12 +1,14 @@
 # modal-devin
 
-Run Devin Outposts sessions on Modal.
+Run [Devin Outposts](https://docs.devin.ai/cloud/outposts/overview) sessions on
+Modal.
 
 Devin's planning remains in Devin Cloud while commands, file edits, and repository
 access run in isolated [Modal Sandboxes](https://modal.com/docs/guide/sandboxes) that
-you control. `modal-devin` provides the orchestrator: it watches your outpost,
-starts a Sandbox for each session, preserves suspended work, and cleans up when the
-session ends.
+you control. [Modal provides the
+orchestrator](https://docs.devin.ai/cloud/outposts/overview#how-it-works) through
+`modal-devin`: it watches the Devin queue, starts a Sandbox for each session,
+preserves suspended work, and cleans up when the session ends.
 
 > [!NOTE]
 > `modal-devin` is alpha software. Until the first stable release, only the latest
@@ -24,30 +26,77 @@ Use `modal-devin` when you want Devin sessions to:
 
 ## How it fits into Outposts
 
-Outposts separates the worker from the orchestrator:
+Following [Devin's Outposts model](https://docs.devin.ai/cloud/outposts/overview#how-it-works),
+there are two runtime layers:
 
-- The **worker** executes one Devin session. `modal-devin` runs it inside a Modal
-  Sandbox.
-- The **orchestrator** finds queued sessions and manages their compute lifecycle.
-  `modal-devin` deploys this layer as a Modal application.
+- The **worker** serves one queued Devin session and executes its tool calls.
+  `modal-devin` runs a worker inside an isolated Modal Sandbox.
+- The **orchestrator** watches for queued sessions, provisions compute, and starts a
+  worker for each one. `modal-devin` deploys the orchestrator as a Modal application.
 
 Workers need outbound HTTPS access to Devin. They do not require inbound ports or a
 public IP.
 
+An **outpost** is a named queue of sessions served by your infrastructure. It is not
+a machine that you set up locally. After deployment, the orchestrator runs on Modal,
+and each session runs in its own Modal Sandbox; your local machine is only used to
+configure and deploy the application.
+
 ## Quick start
 
-You need Python 3.11 or newer, a configured Modal account, an outpost ID, and
-a Devin token authorized for that outpost.
+Before starting, you need:
+
+- Python 3.11 or newer and a [Modal account](https://modal.com/docs/guide/modal-user-account-setup).
+- A Devin organization with Outposts enabled. Outposts is currently early access;
+  contact your Cognition account team if it is not available.
+- A Devin service user token with the Outposts permissions described below.
+
+### 1. Create the Devin service user token
+
+In the Devin web app:
+
+1. Under **Settings → Roles**, create an enterprise role with **Use outpost
+   machine** (`UseOutpostsMachine`) and **Manage outposts**
+   (`ManageOutpostsOrchestrator`) enabled.
+2. Under **Settings → Devin API → Service users**, provision a service user with
+   that role.
+3. Copy the `cog_...` token when it is shown. Devin only displays it once.
+
+These permissions give the token the `account.outposts.machine` and
+`account.outposts.orchestrator` scopes. See Devin's [Outposts
+prerequisites](https://docs.devin.ai/cloud/outposts/overview#prerequisites) and
+[permissions reference](https://docs.devin.ai/api-reference/v3/overview) for more
+detail.
+
+### 2. Create and deploy the outpost
 
 ```bash
 uv add modal-devin
 uv run modal setup
-uv run modal-devin init my-outpost --outpost-id outpost_env-...
+uv run modal-devin init my-outpost --no-deploy
 uv run modal-devin doctor
 uv run modal-devin deploy outposts/my_outpost.py
 ```
 
-Run `uv run modal-devin init` without arguments to create an outpost interactively.
+`init` prompts for the Devin token, creates the named outpost through Devin's
+Outposts API, offers to store the token as a Modal Secret, and generates the Modal
+application. You do not need to install the Devin CLI or run a worker on your local
+machine. Run `uv run modal-devin init` without arguments for the fully interactive
+wizard.
+
+If you already created an outpost in the Devin web app or with
+[`devin worker outpost create`](https://docs.devin.ai/cloud/outposts/overview#2-create-an-outpost),
+connect it instead by passing its `outpost_env-...` ID:
+
+```bash
+uv run modal-devin init my-outpost --outpost-id outpost_env-... --no-deploy
+```
+
+### 3. Start a Devin session
+
+In Devin Cloud, start a session and select `my-outpost` as its machine. Devin puts
+the session in the outpost's queue; the Modal orchestrator claims it and starts its
+worker in a new Sandbox.
 
 The generated Python file is your Modal application. Edit it to choose the workspace
 image, secrets, compute, region, retry policy, and schedule. The library manages the

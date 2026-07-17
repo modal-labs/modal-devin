@@ -8,7 +8,18 @@ Use the setup wizard when you need a new outpost. It can configure
 Modal, create the outpost, store the Devin token, generate the application, and
 deploy it.
 
+In Devin's terminology, an [outpost is a named queue of
+sessions](https://docs.devin.ai/cloud/outposts/overview#2-create-an-outpost) served by
+your infrastructure. This workflow creates that queue in Devin and deploys its
+orchestrator to Modal. It does not run the orchestrator or a worker on your local
+machine.
+
 ## Before you begin
+
+You need Python 3.11 or newer, a [Modal
+account](https://modal.com/docs/guide/modal-user-account-setup), and a Devin
+organization with Outposts enabled. Outposts is early access; contact your Cognition
+account team if it is unavailable.
 
 Install the package:
 
@@ -16,9 +27,30 @@ Install the package:
 uv add modal-devin
 ```
 
-You also need a Devin organization with Outposts enabled and a token authorized to
-create and serve outposts. This wizard runs without a local Devin CLI because `init`
-creates the outpost through the Devin Outposts API.
+## Create a Devin service user token
+
+The orchestrator and workers authenticate with a Devin v3 API token belonging to a
+service user. In the Devin web app:
+
+1. Open **Settings → Roles** and create an enterprise role.
+2. Under **Outpost permissions**, enable **Use outpost machine**
+   (`UseOutpostsMachine`) and **Manage outposts** (`ManageOutpostsOrchestrator`).
+3. Open **Settings → Devin API → Service users**, provision a service user with that
+   role, and choose an expiration.
+4. Copy the `cog_...` token when it appears. Devin displays it only once.
+
+These permissions grant `account.outposts.machine` and
+`account.outposts.orchestrator`. The latter is required for the wizard to create the
+outpost. See Devin's [Outposts quickstart and permission
+definitions](https://docs.devin.ai/cloud/outposts/overview#1-create-a-service-user-token).
+
+<Note>
+  Use this scoped role rather than an administrator role. The generated application
+  needs Outposts access, not general Devin administration permissions.
+</Note>
+
+The wizard runs without a local Devin CLI because `init` creates the outpost through
+the Devin Outposts API.
 
 <Steps>
   <Step title="Start the wizard">
@@ -39,8 +71,9 @@ creates the outpost through the Devin Outposts API.
   </Step>
 
   <Step title="Provide the Devin token">
-    The wizard uses the token to create the outpost and offers to store it as a
-    Modal Secret. Input is hidden, and the generated application excludes the token.
+    Paste the `cog_...` service user token. The wizard uses it to create the outpost
+    and offers to store it as a Modal Secret. Input is hidden, and the generated
+    application excludes the token.
   </Step>
 
   <Step title="Deploy">
@@ -49,6 +82,12 @@ creates the outpost through the Devin Outposts API.
     ```bash
     uv run modal-devin deploy outposts/<generated_name>.py
     ```
+  </Step>
+
+  <Step title="Start a session in Devin">
+    In Devin Cloud, start a new session and select the new outpost as its machine.
+    Devin queues the session; the Modal orchestrator claims it and starts a worker in
+    a new Sandbox.
   </Step>
 </Steps>
 

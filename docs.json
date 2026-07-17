@@ -77,6 +77,10 @@
   "navbar": {
     "links": [
       {
+        "label": "Devin Outposts",
+        "href": "https://docs.devin.ai/cloud/outposts/overview"
+      },
+      {
         "label": "GitHub",
         "href": "https://github.com/modal-labs/modal-devin"
       }

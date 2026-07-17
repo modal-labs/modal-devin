@@ -16,6 +16,11 @@ The package module is an equivalent entrypoint:
 uv run python -m modal_devin COMMAND
 ```
 
+In Devin's terminology, an [outpost is a named session
+queue](https://docs.devin.ai/cloud/outposts/overview#2-create-an-outpost). The CLI
+registers or connects that queue to an orchestrator deployed on Modal; it does not
+start an orchestrator on the local machine.
+
 ## Global commands
 
 | Command | Purpose |
@@ -43,7 +48,8 @@ Generates one Python application in `OUTPOSTS_DIR`. In an interactive terminal, 
 <ParamField path="--outpost-id" type="string">
   Existing Devin Outposts outpost ID. When omitted, `init` creates a new outpost by
   calling the Devin Outposts API directly (`POST /opbeta/outposts`), using the
-  `DEVIN_OUTPOSTS_TOKEN` environment variable or an interactive prompt for the token.
+  `DEVIN_OUTPOSTS_TOKEN` environment variable or an interactive prompt for a
+  `cog_...` service user token with `account.outposts.orchestrator` access.
 </ParamField>
 
 <ParamField path="--api-url" type="string" default="https://api.beta.devinenterprise.com">

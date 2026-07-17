@@ -4,9 +4,10 @@ description: Run Devin Outposts sessions on Modal with the compute, workspace, a
 icon: rocket
 ---
 
-`modal-devin` lets you run Devin's work where your work already lives. Devin plans
-in Devin Cloud while commands, file edits, repository access, and workloads run in
-isolated Modal Sandboxes you configure and control.
+`modal-devin` runs [Devin Outposts](https://docs.devin.ai/cloud/outposts/overview)
+sessions on Modal. Devin's agent loop (inference and planning) remains in Devin
+Cloud, while command execution, file edits, and repository access happen in isolated
+Modal Sandboxes you configure and control.
 
 <Note>
   **What is Modal?** Modal is a cloud platform for running code without managing
@@ -36,21 +37,27 @@ Use a Modal-backed outpost when Devin needs:
 
 ## How it works
 
-`modal-devin` connects an outpost to Modal in two parts:
+An **outpost** is a named queue of Devin sessions served by infrastructure you
+control. It is not a machine you must run locally.
 
-1. The **orchestrator** watches your outpost for queued sessions and manages their
-   compute lifecycle as a Modal application.
-2. The **worker** runs each accepted session inside its own Modal Sandbox.
+[Devin's Outposts model](https://docs.devin.ai/cloud/outposts/overview#how-it-works)
+has two runtime layers:
+
+1. The **worker** serves one queued session and executes its tool calls.
+2. [Modal provides the
+   **orchestrator**](https://docs.devin.ai/cloud/outposts/overview#how-it-works)
+   through `modal-devin`. It watches the queue, provisions a Sandbox, and starts a
+   worker for each session.
 
 Workers need outbound HTTPS access to Devin and run without inbound ports or a public
 IP.
 
 ```mermaid
 flowchart LR
-    D["Devin Cloud"] --> P["Your outpost"]
-    P --> O["modal-devin orchestrator"]
-    O --> S["Modal Sandbox"]
-    S --> W["Devin worker and your workspace"]
+    D["Devin Cloud<br/>agent loop and session UI"] --> P["Outpost<br/>named session queue"]
+    P --> O["modal-devin<br/>orchestrator on Modal"]
+    O --> S["Modal Sandbox<br/>worker and your workspace"]
+    S --> D
 ```
 
 ## Get started
@@ -75,7 +82,7 @@ flowchart LR
 Run the guided setup from the project that will own the outpost:
 
 ```bash
-uvx run modal-devin init
+uv run modal-devin init
 ```
 
 It creates an outpost, writes a minimal Modal application to your repository, and can
@@ -101,9 +108,11 @@ Outposts lifecycle.
 
 - Python 3.11 or newer.
 - A Modal account with locally configured credentials.
-- A Devin organization with Outposts enabled.
+- A Devin organization with Outposts enabled. Outposts is early access; contact your
+  Cognition account team if it is unavailable.
 - An existing outpost ID, or permission to create one through the setup wizard.
-- A Devin token authorized to manage the outpost and serve its sessions.
+- A Devin service user token with the Outposts permissions described in [Create an
+  outpost interactively](/tutorials/create-an-outpost#create-a-devin-service-user-token).
 
 <Card title="Deploy your first worker" icon="arrow-right" href="/tutorials/first-worker" horizontal>
   Follow the shortest path from installation to a verified deployment.

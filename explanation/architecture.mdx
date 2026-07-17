@@ -4,17 +4,20 @@ description: Where Devin Cloud, modal-devin, Modal, and the worker fit together.
 icon: diagram-project
 ---
 
-Devin Outposts separates planning from execution. Devin's agent loop remains in
-Devin Cloud, while commands, file edits, and repository access happen on compute you
+[Devin Outposts](https://docs.devin.ai/cloud/outposts/overview) separates planning
+from execution. Devin's agent loop (inference and planning) remains in Devin Cloud,
+while command execution, file edits, and repository access happen on compute you
 operate.
 
-`modal-devin` supplies the orchestrator for Modal. It connects an outpost to
-isolated [Modal Sandboxes](https://modal.com/docs/guide/sandboxes) and manages each
-session from startup through cleanup.
+An **outpost** is a named queue of sessions served by your infrastructure. Following
+[Devin's two-layer
+model](https://docs.devin.ai/cloud/outposts/overview#how-it-works), Modal provides the
+orchestrator through `modal-devin`, and isolated [Modal
+Sandboxes](https://modal.com/docs/guide/sandboxes) provide the workers.
 
 ```mermaid
 flowchart LR
-    D["Devin Cloud<br/>planning and session UI"] --> P["Outpost"]
+    D["Devin Cloud<br/>agent loop and session UI"] --> P["Outpost<br/>named session queue"]
     P --> O["modal-devin<br/>orchestrator on Modal"]
     O --> S["Modal Sandbox<br/>workspace and Devin worker"]
     S --> D
@@ -22,8 +25,9 @@ flowchart LR
 
 ## The worker
 
-The Devin worker serves one session. Inside its Sandbox it can run commands, edit
-files, use project tools, and reach services allowed by your Modal environment.
+The worker is Cognition's runtime for serving one queued session. Inside its Sandbox
+it executes Devin's tool calls: running commands, editing files, using project tools,
+and reaching services allowed by your Modal environment.
 
 The workspace comes from either the current deployed image or a preserved filesystem
 from an earlier suspended attempt.
@@ -37,6 +41,9 @@ The generated Modal application is the orchestrator deployment. It:
 - Runs the worker and streams its output to Modal logs.
 - Preserves the workspace when the session suspends.
 - Cleans up compute and makes failed work retryable.
+
+It runs on Modal after deployment. Nothing in the runtime path depends on the local
+machine from which you ran `modal-devin init` or `modal-devin deploy`.
 
 Your generated file exposes deployment policy such as images, secrets, compute,
 regions, retries, and schedule. The library keeps the Outposts and Sandbox lifecycle

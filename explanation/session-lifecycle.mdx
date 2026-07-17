@@ -19,8 +19,9 @@ flowchart LR
 
 ## 1. A session is queued
 
-When a user selects your outpost in Devin, the session waits for an available
-orchestrator. The deployed Modal application watches that outpost.
+When a user selects your outpost as the session's machine in Devin Cloud, Devin puts
+the session in that outpost's queue. It waits there for a worker. The deployed Modal
+orchestrator watches the queue and provisions that worker.
 
 ## 2. The session is accepted
 

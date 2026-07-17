@@ -14,6 +14,13 @@ Both orchestration and the worker need to communicate with Devin. The generated 
 functions receive the configured [Secret](https://modal.com/docs/guide/secrets), but
 the raw token is kept out of the main Sandbox environment.
 
+Use a Devin v3 API token belonging to a scoped service user. The role needs **Manage
+outposts** (`ManageOutpostsOrchestrator`, `account.outposts.orchestrator`) for the
+orchestrator and **Use outpost machine** (`UseOutpostsMachine`,
+`account.outposts.machine`) for workers. Follow Devin's [Outposts token
+setup](https://docs.devin.ai/cloud/outposts/overview#1-create-a-service-user-token);
+do not substitute a broad administrator role.
+
 The worker communicates through a restricted local credential boundary that permits
 the Outposts API capability it needs. Other API paths are rejected.
 

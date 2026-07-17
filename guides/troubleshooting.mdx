@@ -26,6 +26,13 @@ uv run modal-devin doctor
     needs `DEVIN_OUTPOSTS_TOKEN` to authorize the request. Set the environment
     variable, or pass `--outpost-id` to `init` to use an existing outpost instead.
   </Accordion>
+  <Accordion title="The Devin token is rejected">
+    Confirm that it is a `cog_...` v3 token belonging to a service user. Its role
+    needs **Manage outposts** (`account.outposts.orchestrator`) and **Use outpost
+    machine** (`account.outposts.machine`). Follow Devin's [service user token
+    setup](https://docs.devin.ai/cloud/outposts/overview#1-create-a-service-user-token)
+    and avoid using an administrator role.
+  </Accordion>
   <Accordion title="The generated file already exists">
     Edit and redeploy the existing file, or choose another name or `--outposts-dir`.
     `init` never overwrites application code.
@@ -47,8 +54,8 @@ uv run modal-devin doctor
 
 ## No session starts
 
-1. Confirm the session was assigned to the same outpost ID as the generated
-   application.
+1. In Devin Cloud, confirm the session's selected machine is the same named outpost
+   whose `outpost_env-...` ID appears in the generated application.
 2. Run `modal-devin doctor` with the Secret name used by the application; it checks
    that every outpost file in `--outposts-dir` has a matching deployed Modal app.
 3. Confirm the deployed application's scheduled function is active.
