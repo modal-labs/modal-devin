@@ -125,7 +125,8 @@ Full tutorials, how-to guides, and reference docs live in this repository under
 project's Mintlify site, which isn't published yet, so some page components won't
 render when viewed directly on GitHub:
 
-- [Deploy your first worker](tutorials/first-worker.mdx)
+- [Create and deploy your first outpost](tutorials/create-an-outpost.mdx)
+- [Connect an existing outpost](tutorials/first-worker.mdx)
 - [Build a project workspace](tutorials/custom-workspace.mdx)
 - [Configure resources and regions](guides/resources-and-regions.mdx)
 - [Operate a deployed worker](guides/operate-a-worker.mdx)
