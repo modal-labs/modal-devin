@@ -12,6 +12,7 @@ from enum import StrEnum
 from types import TracebackType
 from typing import Protocol, TypeAlias, cast
 
+from modal_devin._config import validate_outpost_name
 from modal_devin._exceptions import OutpostsAPIError, OutpostsProtocolError
 
 JsonValue: TypeAlias = str | int | float | bool | None | list["JsonValue"] | dict[str, "JsonValue"]
@@ -186,6 +187,7 @@ class OutpostsClient:
         return f"/opbeta/outposts/devins/{encoded}"
 
     def create_outpost(self, name: str, *, platform: str = "linux", description: str = "") -> str:
+        validate_outpost_name(name)
         response = self._request(
             "POST",
             "/opbeta/outposts",

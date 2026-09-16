@@ -5,6 +5,28 @@ and uses semantic versioning.
 
 ## Unreleased
 
+### Added
+
+- `modal-devin init` and `OutpostsClient.create_outpost` now validate outpost names locally
+  (lowercase letters, digits, dashes, underscores) before calling the API; interactive runs
+  re-prompt instead of failing.
+
+## 0.1.13 - 2026-09-16
+
+### Fixed
+
+- The `devin` CLI renamed `worker start --pool` to `--outpost`, which made the
+  worker image's build-time contract check fail (`modal deploy` broke during the
+  image build) and would have made the worker command itself fail at runtime.
+  Both the contract check and the `sandbox.exec` worker command now use
+  `--outpost`.
+
+### Changed
+
+- The default API URL is now `https://api.devin.ai` (Outposts left beta;
+  `https://api.beta.devinenterprise.com` is no longer the default). Explicit
+  `api_url` / `DEVIN_API_URL` / `--api-url` overrides are unchanged.
+
 ## 0.1.12 - 2026-07-19
 
 ### Changed

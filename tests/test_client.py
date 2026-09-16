@@ -6,7 +6,7 @@ from email.message import Message
 
 import pytest
 
-from modal_devin import OutpostsAPIError, OutpostsProtocolError
+from modal_devin import ConfigurationError, OutpostsAPIError, OutpostsProtocolError
 from modal_devin._client import ClaimConflict, OutpostsClient, PendingSession, SessionStatus
 
 
@@ -248,6 +248,15 @@ def test_create_outpost_posts_to_opbeta_outposts_and_returns_the_id():
         "description": "",
     }
     assert request.get_header("Authorization") == "Bearer token-123"
+
+
+def test_create_outpost_rejects_invalid_names_without_a_request():
+    recorder = RecordingUrlOpen([])
+
+    with pytest.raises(ConfigurationError, match="lowercase letters"):
+        make_client(recorder).create_outpost("Bad Name")
+
+    assert recorder.requests == []
 
 
 def test_create_outpost_raises_a_protocol_error_when_the_id_is_missing():

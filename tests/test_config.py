@@ -5,7 +5,7 @@ import re
 import pytest
 
 from modal_devin import ConfigurationError, WorkerSettings
-from modal_devin._config import WorkerConfig
+from modal_devin._config import WorkerConfig, validate_outpost_name
 
 
 def test_worker_settings_default_to_three_second_polling():
@@ -25,6 +25,25 @@ def test_worker_config_derives_safe_bounded_modal_names():
         assert len(value) < 64
         assert re.fullmatch(r"[a-z0-9._-]+", value)
     assert config.acceptor_id.startswith("modal-")
+
+
+@pytest.mark.parametrize(
+    ("value", "valid"),
+    [
+        ("gpu-h200", True),
+        ("prod_vpc1", True),
+        ("GPU", False),
+        ("a b", False),
+        ("a.b", False),
+        ("", False),
+    ],
+)
+def test_validate_outpost_name(value, valid):
+    if valid:
+        assert validate_outpost_name(value) == value
+    else:
+        with pytest.raises(ConfigurationError, match="lowercase letters"):
+            validate_outpost_name(value)
 
 
 @pytest.mark.parametrize(

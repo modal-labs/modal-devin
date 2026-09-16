@@ -12,7 +12,7 @@ from typing import Any, Self, cast
 
 from modal_devin._exceptions import ConfigurationError
 
-DEFAULT_API_URL = "https://api.beta.devinenterprise.com"
+DEFAULT_API_URL = "https://api.devin.ai"
 DEFAULT_SCHEDULER_INTERVAL_SECONDS = 3
 DEFAULT_SESSION_TIMEOUT_SECONDS = 12 * 60 * 60
 DEFAULT_API_TIMEOUT_SECONDS = 30.0
@@ -33,6 +33,17 @@ _TERMINATION_MARGIN_SECONDS = 30
 
 _RESOURCE_COMPONENT_RE = re.compile(r"[^a-z0-9._-]+")
 _ENV_PREFIX = "MODAL_DEVIN_"
+OUTPOST_NAME_RE = re.compile(r"^[a-z0-9_-]+$")
+
+
+def validate_outpost_name(value: str) -> str:
+    """Return ``value`` if it is a valid Devin Outpost name, else raise ConfigurationError."""
+    if not OUTPOST_NAME_RE.fullmatch(value):
+        raise ConfigurationError(
+            f"invalid outpost name {value!r}: names may only contain lowercase letters, "
+            "digits, dashes, and underscores"
+        )
+    return value
 
 
 def _resource_slug(value: str, *, max_length: int = 32) -> str:

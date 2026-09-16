@@ -506,6 +506,47 @@ def test_init_rejects_invalid_api_url_before_remote_changes(tmp_path, monkeypatc
         )
 
 
+def test_init_rejects_invalid_outpost_name_before_remote_changes(tmp_path, monkeypatch):
+    monkeypatch.setattr(cli, "_interactive", lambda: False)
+    _forbid_remote_outpost_calls(monkeypatch)
+
+    with pytest.raises(SystemExit, match="lowercase letters"):
+        cli.init_worker(name="Bad Name", outposts_dir=tmp_path)
+
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_init_reprompts_for_an_invalid_outpost_name_interactively(tmp_path, monkeypatch):
+    token = "super-secret-token"
+    monkeypatch.setattr(cli, "_interactive", lambda: True)
+    monkeypatch.setattr(cli, "_modal_is_configured", lambda: True)
+    monkeypatch.setattr(cli, "_existing_secret_names", lambda: {"devin-outposts-token"})
+    monkeypatch.setattr(cli, "_erase_last_line", lambda: None)
+    monkeypatch.setenv("DEVIN_OUTPOSTS_TOKEN", token)
+
+    recorder = RecordingUrlOpen([{"metadata": {"outpost_id": "outpost_env-demo"}}])
+    monkeypatch.setattr(cli, "OutpostsClient", _fake_outposts_client(recorder))
+    names = iter(["Bad Name", "good-name_1"])
+    monkeypatch.setattr(cli, "_ask", lambda *args, **kwargs: next(names))
+    monkeypatch.setattr(cli, "_confirm", lambda *args, **kwargs: False)
+
+    cli.init_worker(outposts_dir=tmp_path, deploy=False)
+
+    [request] = recorder.requests
+    assert json.loads(request.data)["name"] == "good-name_1"
+
+
+def test_init_skips_outpost_name_validation_when_connecting_an_existing_outpost(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(cli, "_interactive", lambda: False)
+    monkeypatch.setattr(cli, "_existing_secret_names", lambda: {"devin-outposts-token"})
+
+    cli.init_worker(name="Demo Worker", outpost_id="outpost_env-demo", outposts_dir=tmp_path)
+
+    assert (tmp_path / "demo_worker.py").exists()
+
+
 def test_init_rejects_empty_secret_name_before_remote_changes(tmp_path, monkeypatch):
     monkeypatch.setattr(cli, "_interactive", lambda: False)
     _forbid_remote_outpost_calls(monkeypatch)
@@ -549,7 +590,7 @@ def test_init_creates_the_outpost_via_a_direct_api_call(tmp_path, monkeypatch):
     cli.init_worker(name="demo", outposts_dir=tmp_path)
 
     [request] = recorder.requests
-    assert request.full_url == "https://api.beta.devinenterprise.com/opbeta/outposts"
+    assert request.full_url == "https://api.devin.ai/opbeta/outposts"
     assert request.get_method() == "POST"
     assert json.loads(request.data) == {
         "name": "demo",
@@ -598,10 +639,7 @@ def test_failed_write_rolls_back_a_newly_created_outpost(tmp_path, monkeypatch):
         cli.init_worker(name="demo", outposts_dir=tmp_path)
 
     [delete_request] = delete_recorder.requests
-    assert (
-        delete_request.full_url
-        == "https://api.beta.devinenterprise.com/opbeta/outposts/outpost_env-demo"
-    )
+    assert delete_request.full_url == "https://api.devin.ai/opbeta/outposts/outpost_env-demo"
     assert delete_request.get_method() == "DELETE"
 
 

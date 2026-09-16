@@ -17,7 +17,7 @@ Worker(
     name: str,
     *,
     outpost_id: str,
-    api_url: str = "https://api.beta.devinenterprise.com",
+    api_url: str = "https://api.devin.ai",
     settings: WorkerSettings | None = None,
 )
 ```
@@ -30,7 +30,7 @@ Worker(
   Devin Outposts outpost ID.
 </ParamField>
 
-<ParamField path="api_url" type="string" default="https://api.beta.devinenterprise.com">
+<ParamField path="api_url" type="string" default="https://api.devin.ai">
   Devin API base URL. Credentials, query strings, and fragments are rejected.
 </ParamField>
 
@@ -45,7 +45,7 @@ Worker.from_env(
     name: str,
     *,
     outpost_id: str,
-    api_url: str = "https://api.beta.devinenterprise.com",
+    api_url: str = "https://api.devin.ai",
 ) -> Worker
 ```
 
