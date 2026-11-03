@@ -1,6 +1,6 @@
 [project]
 name = "modal-devin"
-version = "0.1.12"
+version = "0.1.13"
 description = "Run Devin Outposts workers on Modal"
 readme = "README.md"
 requires-python = ">=3.11"

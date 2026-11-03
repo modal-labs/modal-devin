@@ -549,7 +549,7 @@ def test_init_creates_the_outpost_via_a_direct_api_call(tmp_path, monkeypatch):
     cli.init_worker(name="demo", outposts_dir=tmp_path)
 
     [request] = recorder.requests
-    assert request.full_url == "https://api.beta.devinenterprise.com/opbeta/outposts"
+    assert request.full_url == "https://api.devin.ai/opbeta/outposts"
     assert request.get_method() == "POST"
     assert json.loads(request.data) == {
         "name": "demo",
@@ -600,7 +600,7 @@ def test_failed_write_rolls_back_a_newly_created_outpost(tmp_path, monkeypatch):
     [delete_request] = delete_recorder.requests
     assert (
         delete_request.full_url
-        == "https://api.beta.devinenterprise.com/opbeta/outposts/outpost_env-demo"
+        == "https://api.devin.ai/opbeta/outposts/outpost_env-demo"
     )
     assert delete_request.get_method() == "DELETE"
 

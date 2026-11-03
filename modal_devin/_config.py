@@ -12,7 +12,7 @@ from typing import Any, Self, cast
 
 from modal_devin._exceptions import ConfigurationError
 
-DEFAULT_API_URL = "https://api.beta.devinenterprise.com"
+DEFAULT_API_URL = "https://api.devin.ai"
 DEFAULT_SCHEDULER_INTERVAL_SECONDS = 3
 DEFAULT_SESSION_TIMEOUT_SECONDS = 12 * 60 * 60
 DEFAULT_API_TIMEOUT_SECONDS = 30.0
