@@ -188,7 +188,7 @@ def test_suspended_session_is_snapshotted_by_id(monkeypatch, config, settings):
         "start",
         "--session",
         "devin-1",
-        "--pool",
+        "--outpost",
         config.outpost_id,
         "--acceptor-id",
         "modal-demo-attempt",

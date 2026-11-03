@@ -5,6 +5,14 @@ and uses semantic versioning.
 
 ## Unreleased
 
+## 0.1.14 - 2026-11-03
+
+### Fixed
+
+- Workers now start with `devin worker start --outpost` instead of `--pool`, which
+  Devin CLI v3000.11.234 removed. Worker image builds failed the CLI contract check
+  (and workers would have failed to launch) against that CLI release.
+
 ## 0.1.13 - 2026-11-03
 
 ### Changed

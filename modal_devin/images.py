@@ -16,7 +16,7 @@ _DEVIN_CLI_INSTALL = f"curl -fsSL https://cli.devin.ai/install.sh | bash; test -
 _DEVIN_CLI_CONTRACT_CHECK = (
     f"{_DEVIN_BIN} worker start --help > /tmp/devin-worker-help "
     "&& grep -q -- '--session' /tmp/devin-worker-help "
-    "&& grep -q -- '--pool' /tmp/devin-worker-help "
+    "&& grep -q -- '--outpost' /tmp/devin-worker-help "
     "&& grep -q -- '--acceptor-id' /tmp/devin-worker-help "
     "&& grep -q 'DEVIN_REMOTE_SESSION_TOKEN' /tmp/devin-worker-help "
     "&& rm /tmp/devin-worker-help"

@@ -521,7 +521,7 @@ def _run_claimed_session(
                 "start",
                 "--session",
                 session_id,
-                "--pool",
+                "--outpost",
                 config.outpost_id,
                 "--acceptor-id",
                 acceptor_id,
